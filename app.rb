@@ -1,94 +1,100 @@
 require 'httparty'
 require 'json'
 require './libs/NormalizeInput.rb'
-
-# Recieve user ingredients input
-print "\n"
-puts '*' * 40
-puts "\tWelcome to RecipePuppy"
-puts '*' * 40
-puts "Please specify one or more ingredients and we will match the best recipes for you!"
-puts "Specify your ingredient(s) here:"
-print "> "
+require './libs/BaseURL.rb'
 
 # Globals
 base_url = 'http://www.recipepuppy.com/api/?q=omelet&i='
+
+# Greet user and recieve input
+print "\n"
+puts '*' * 40, '*' * 40
+puts "\tWelcome to RecipePuppy"
+puts '*' * 40, '*' * 40
+
+puts """
+Here in RecipePuppy we work around the clock 
+to best match what your stomach truly desires.
+"""
+
+print "\n"
+puts "Today we will be doing omelets."
+puts "List the initial ingredients or leave blank"
+print "> "
+
 user_input = $stdin.gets.chomp
 
 # Normalize input 
 user_ingredients = NormalizeInput.to_array(user_input)
 
 # Init base URL for HTTP request
-def initURL(base, params)
-    url = base.concat(params.join(','))
-    return url
-end
-
-final_url = initURL(base_url, user_ingredients)
+request_url = BaseURL.init(base_url, user_ingredients)
 
 # Send HTTP GET request and parse JSON
-response = HTTParty.get(final_url)
+response = HTTParty.get(request_url)
 
 if response.code != 200
-    puts "Server responded with a #{response.code} error, please retry later"
-    # handleError()
+    puts "Server responded with #{response.code} error, please retry later"
+    # TO DO: handleError()
     exit(0)
 end
 
-responseHash = JSON.parse(response)
+search_results = JSON.parse(response)
 
 # Check if no results
-if responseHash['results'].length == 0
+if search_results['results'].length == 0
     puts "We couldn't find a match to your query, please check your spelling and try agian."
     exit(0)
 end
 
-recipes = responseHash['results']
-
 # Check ingredients subroutine
+recipes = search_results['results']
+missing_ingredients = []
+matching_recipe = []
 
-missingIng = []
+recipes.each do |recipe|
 
-recipes.each do |item|
+    ingredients = recipe['ingredients'].split(', ')
 
-    ingredients = item['ingredients'].split(', ')
-
-    puts "=" * 50
-    puts "let's check if you can make #{item['title'].strip}"
+    print "\n"
+    puts "let's check if you can make #{recipe['title'].strip}"
     puts "." * 50
 
-    print "In order to make it you need: #{ingredients} \n" 
-    print "you have: #{user_ingredients} \n" 
-    print "you do not have: #{missingIng} \n" 
+    puts "Required ingredients: #{ingredients.join(', ')}" 
+    puts "Your ingredients: #{user_ingredients.join(', ')}" 
+    puts "Missing ingredients: #{missing_ingredients.join(', ')}" 
     
-    ingredients.each_with_index do |ing, idx|
+    ingredients.each_with_index do |ingredient, idx|
 
-        if missingIng.include? (ing)
+        if missing_ingredients.include? (ingredient)
             break
         end
 
-        next if user_ingredients.include? (ing)
+        next if user_ingredients.include? (ingredient)
 
-        print "Do you have #{ing} > "
+        print "Do you have #{ingredient}? (yes / no) > "
         answer = $stdin.gets.chomp
 
         if answer == 'no'
-            missingIng.push(ing)
+            missing_ingredients.push(ingredient)
+            puts "\nDon't worry, Let's try another."
             break
         end
 
         if answer == 'yes'
-            user_ingredients.push(ing)
+            user_ingredients.push(ingredient)
         end
         
         if idx == ingredients.length - 1
-            puts "You can make #{item['title'].strip}!!!"
+            puts "\nYou can make \"#{recipe['title'].strip}\"!"
+            matching_recipe.push({'Recipe' => recipe['title'].strip})
         end
 
     end
 
 end
 
+puts matching_recipe
 
 
 
