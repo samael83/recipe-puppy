@@ -26,7 +26,7 @@ end
 
 final_url = initURL(base_url, user_ingredients)
 
-# Send HTTP GET request
+# Send HTTP GET request and parse JSON
 response = HTTParty.get(final_url)
 
 if response.code != 200
@@ -35,7 +35,6 @@ if response.code != 200
     exit(0)
 end
 
-# Parse JSON
 responseHash = JSON.parse(response)
 
 # Check if no results
@@ -62,7 +61,7 @@ recipes.each do |item|
     print "you have: #{user_ingredients} \n" 
     print "you do not have: #{missingIng} \n" 
     
-    ingredients.each do |ing|
+    ingredients.each_with_index do |ing, idx|
 
         if missingIng.include? (ing)
             break
@@ -81,11 +80,12 @@ recipes.each do |item|
         if answer == 'yes'
             user_ingredients.push(ing)
         end
+        
+        if idx == ingredients.length - 1
+            puts "You can make #{item['title'].strip}!!!"
+        end
 
     end
-
-    # TO DO: Print results: title and link
-    puts "You can make #{item['title'].strip}!!!"
 
 end
 
