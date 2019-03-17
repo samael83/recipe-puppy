@@ -3,3 +3,9 @@ A simple API app that runs in your terminal based on the Recipe Puppy API
 
 ## Dependencies
 * httparty
+
+## Known Issues
+* Currently not addressing spelling
+* Digits in user input
+* Pagination
+* Single / Plural

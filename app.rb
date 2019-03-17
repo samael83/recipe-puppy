@@ -1,14 +1,15 @@
 require 'httparty'
 require 'json'
 require './libs/NormalizeInput.rb'
+require 'pp'
 
 # Recieve user ingredients input
 print "\n"
-puts '*' * 23
-puts "Welcome to RecipePuppy."
-puts '*' * 23
+puts '*' * 40
+puts "\tWelcome to RecipePuppy"
+puts '*' * 40
 puts "Please specify one or more ingredients and we will match the best recipes for you!"
-puts "Specify your ingredient here:"
+puts "Specify your ingredient(s) here:"
 print "> "
 
 # Globals
@@ -19,17 +20,29 @@ user_input = $stdin.gets.chomp
 user_ingredients = NormalizeInput.to_array(user_input)
 
 # Init base URL for HTTP request
-def initURL(url, arr)
-    str = url + arr.join(',')
-    return str
+def initURL(base, params)
+    url = base.concat(params.join(','))
+    return url
 end
+
 final_url = initURL(base_url, user_ingredients)
 
 # Send HTTP GET request
     # if errors => handle errors
 
+response = HTTParty.get(final_url)
+
+if response.code !== 200
+    puts "Server returned an error, retrying in 5 sec..."
+    # handleError()
+end
+
 # Parse and store response as JSON object
     # handle no results found
+responseHash = JSON.parse(response)
+puts responseHash['results'].length
+
+
 
 # Check ingredients subroutine
 
