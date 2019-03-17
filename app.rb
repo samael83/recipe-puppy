@@ -2,6 +2,7 @@ require 'httparty'
 require 'json'
 require './libs/NormalizeInput.rb'
 require './libs/BaseURL.rb'
+require './libs/HandleResponse.rb'
 
 # Globals
 base_url = 'http://www.recipepuppy.com/api/?q=omelet&i='
@@ -18,7 +19,7 @@ to best match what your stomach truly desires.
 """
 
 print "\n"
-puts "Today we will be doing omelets."
+puts "Today we will be making omelets."
 puts "List the initial ingredients or leave blank"
 print "> "
 
@@ -33,24 +34,20 @@ request_url = BaseURL.init(base_url, user_ingredients)
 # Send HTTP GET request and parse JSON
 response = HTTParty.get(request_url)
 
-if response.code != 200
-    puts "Server responded with #{response.code} error, please retry later"
-    # TO DO: handleError()
-    exit(0)
-end
+HandleResponse.error(response.code) if response.code != 200
 
 search_results = JSON.parse(response)
-
-# Check if no results
-if search_results['results'].length == 0
-    puts "We couldn't find a match to your query, please check your spelling and try agian."
-    exit(0)
-end
 
 # Check ingredients subroutine
 recipes = search_results['results']
 missing_ingredients = []
 matching_recipe = []
+
+# Check if no results
+if recipes.length == 0
+    puts "We couldn't find a match to your query, please check your spelling and try agian."
+    exit(0)
+end
 
 recipes.each do |recipe|
 
@@ -60,6 +57,7 @@ recipes.each do |recipe|
     puts "let's check if you can make #{recipe['title'].strip}"
     puts "." * 50
 
+    # Mostrly for debugging but creates a bit better UI ;)
     puts "Required ingredients: #{ingredients.join(', ')}" 
     puts "Your ingredients: #{user_ingredients.join(', ')}" 
     puts "Missing ingredients: #{missing_ingredients.join(', ')}" 
