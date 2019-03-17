@@ -8,4 +8,4 @@ A simple API app that runs in your terminal based on the Recipe Puppy API
 * Currently not addressing spelling
 * Digits in user input
 * Pagination
-* Single / Plural
+* Single / Plural inputs are not addressed

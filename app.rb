@@ -32,7 +32,7 @@ final_url = initURL(base_url, user_ingredients)
 
 response = HTTParty.get(final_url)
 
-if response.code !== 200
+if response.code != 200
     puts "Server returned an error, retrying in 5 sec..."
     # handleError()
 end
