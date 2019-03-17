@@ -5,7 +5,8 @@ A simple API app that runs in your terminal based on the Recipe Puppy API
 * httparty
 
 ## Known Issues
-* Currently not addressing spelling
-* Digits in user input
+* User input:
+    + Currently not addressing spelling
+    + Digits in user input
+    + Single / Plural inputs are not addressed
 * Pagination
-* Single / Plural inputs are not addressed

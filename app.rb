@@ -1,7 +1,6 @@
 require 'httparty'
 require 'json'
 require './libs/NormalizeInput.rb'
-require 'pp'
 
 # Recieve user ingredients input
 print "\n"
@@ -28,8 +27,6 @@ end
 final_url = initURL(base_url, user_ingredients)
 
 # Send HTTP GET request
-    # if errors => handle errors
-
 response = HTTParty.get(final_url)
 
 if response.code != 200
@@ -38,11 +35,12 @@ if response.code != 200
 end
 
 # Parse and store response as JSON object
-    # handle no results found
 responseHash = JSON.parse(response)
-puts responseHash['results'].length
 
-
+if responseHash['results'].length == 0
+    puts "No matching resluts based on provided input, please check your spelling and try agian."
+    exit(0)
+end
 
 # Check ingredients subroutine
 
