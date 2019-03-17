@@ -1,5 +1,6 @@
 require 'httparty'
 require 'json'
+require './libs/NormalizeInput.rb'
 
 # Globals
 base_url = 'http://www.recipepuppy.com/api/?i='
@@ -16,6 +17,7 @@ print "> "
 user_input = $stdin.gets.chomp
 
 # Normalize input 
+user_ingredients = NormalizeInput.to_array(user_input)
 
 # Init base URL for HTTP request
 
@@ -23,6 +25,7 @@ user_input = $stdin.gets.chomp
     # if errors => handle errors
 
 # Parse and store response as JSON object
+    # handle no results found
 
 # Check ingredients subroutine
 
