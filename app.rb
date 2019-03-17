@@ -12,7 +12,7 @@ puts "Specify your ingredient(s) here:"
 print "> "
 
 # Globals
-base_url = 'http://www.recipepuppy.com/api/?i='
+base_url = 'http://www.recipepuppy.com/api/?q=omelet&i='
 user_input = $stdin.gets.chomp
 
 # Normalize input 
@@ -30,20 +30,67 @@ final_url = initURL(base_url, user_ingredients)
 response = HTTParty.get(final_url)
 
 if response.code != 200
-    puts "Server returned an error, retrying in 5 sec..."
+    puts "Server responded with a #{response.code} error, please retry later"
     # handleError()
-end
-
-# Parse and store response as JSON object
-responseHash = JSON.parse(response)
-
-if responseHash['results'].length == 0
-    puts "No matching resluts based on provided input, please check your spelling and try agian."
     exit(0)
 end
 
+# Parse JSON
+responseHash = JSON.parse(response)
+
+# Check if no results
+if responseHash['results'].length == 0
+    puts "We couldn't find a match to your query, please check your spelling and try agian."
+    exit(0)
+end
+
+recipes = responseHash['results']
+
 # Check ingredients subroutine
 
-# Print results
-    # Recipe title
-    # Recipe link
+missingIng = []
+
+recipes.each do |item|
+
+    ingredients = item['ingredients'].split(', ')
+
+    puts "=" * 50
+    puts "let's check if you can make #{item['title'].strip}"
+    puts "." * 50
+
+    print "In order to make it you need: #{ingredients} \n" 
+    print "you have: #{user_ingredients} \n" 
+    print "you do not have: #{missingIng} \n" 
+    
+    ingredients.each do |ing|
+
+        if missingIng.include? (ing)
+            break
+        end
+
+        next if user_ingredients.include? (ing)
+
+        print "Do you have #{ing} > "
+        answer = $stdin.gets.chomp
+
+        if answer == 'no'
+            missingIng.push(ing)
+            break
+        end
+
+        if answer == 'yes'
+            user_ingredients.push(ing)
+        end
+
+    end
+
+    # TO DO: Print results: title and link
+    puts "You can make #{item['title'].strip}!!!"
+
+end
+
+
+
+
+
+
