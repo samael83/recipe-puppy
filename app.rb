@@ -43,7 +43,7 @@ recipes = search_results['results']
 missing_ingredients = []
 matching_recipe = []
 
-# Check if no results
+# Check for no matches
 if recipes.length == 0
     puts "We couldn't find a match to your query, please check your spelling and try agian."
     exit(0)
@@ -57,44 +57,60 @@ recipes.each do |recipe|
     puts "let's check if you can make #{recipe['title'].strip}"
     puts "." * 50
 
-    # Mostrly for debugging but creates a bit better UI ;)
-    puts "Required ingredients: #{ingredients.join(', ')}" 
-    puts "Your ingredients: #{user_ingredients.join(', ')}" 
-    puts "Missing ingredients: #{missing_ingredients.join(', ')}" 
+    # Debugging: presents state of variables after each iteration
+    # puts "Required ingredients: #{ingredients.join(', ')}" 
+    # puts "Your ingredients: #{user_ingredients.join(', ')}" 
+    # puts "Missing ingredients: #{missing_ingredients.join(', ')}" 
     
     ingredients.each_with_index do |ingredient, idx|
 
+        # Break current iteration if we know ingredient in missing ingredients
         if missing_ingredients.include? (ingredient)
             break
         end
 
-        next if user_ingredients.include? (ingredient)
+        # Skip to next iteration if user has ingredient, unless its the last iteration
+        unless idx == ingredients.length - 1
+            next if user_ingredients.include? (ingredient)
+        end
 
         print "Do you have #{ingredient}? (yes / no) > "
         answer = $stdin.gets.chomp
 
-        if answer == 'no'
+        # If ingredient missing > add to missing ingredients array and stop iteration
+        if answer.downcase == 'no'
             missing_ingredients.push(ingredient)
             puts "\nDon't worry, Let's try another."
             break
         end
 
-        if answer == 'yes'
+        # Add ingredient to user invetory
+        if answer.downcase == 'yes'
             user_ingredients.push(ingredient)
         end
         
+        # If last iteration > add current recipe to final recipes list
         if idx == ingredients.length - 1
-            puts "\nYou can make \"#{recipe['title'].strip}\"!"
-            matching_recipe.push({'Recipe' => recipe['title'].strip})
+            puts "\nYey! You can make \"#{recipe['title'].strip}\"!"
+            matching_recipe.push({'Recipe' => recipe['title'].strip, 'Link' => recipe['href'].strip})
         end
 
     end
 
 end
 
-puts matching_recipe
+# Present the user with recipes
 
-
-
+if matching_recipe.length == 0
+    puts "\n\nWow mate! You should really consider do some grocery shopping..."
+    print "\n"
+else
+    puts "\n\nThere you go Sir, some tasty recipes for you to try out!"
+    matching_recipe.each do |item|
+        puts "Recipe: #{item['Recipe']}"
+        puts "Link: #{item['Link']}"
+        print "\n"
+    end
+end
 
 
