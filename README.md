@@ -2,7 +2,7 @@
 A simple API app that runs in your terminal based on the Recipe Puppy API
 
 ## Dependencies
-* httparty
+* httparty - install with ```gem install httparty```
 
 ## Known Issues
 * User input:
