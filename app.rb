@@ -57,12 +57,7 @@ recipes.each do |recipe|
     puts "let's check if you can make #{recipe['title'].strip}"
     puts "." * 50
 
-    # Debugging: presents state of variables after each iteration
-    # puts "Required ingredients: #{ingredients.join(', ')}" 
-    # puts "Your ingredients: #{user_ingredients.join(', ')}" 
-    # puts "Missing ingredients: #{missing_ingredients.join(', ')}" 
-    
-    ingredients.each_with_index do |ingredient, idx|
+    ingredients.each_with_index do |ingredient, idx| # TO DO: Refactor if statements
 
         # Break current iteration if we know ingredient in missing ingredients
         if missing_ingredients.include? (ingredient)
@@ -100,7 +95,6 @@ recipes.each do |recipe|
 end
 
 # Present the user with recipes
-
 if matching_recipe.length == 0
     puts "\n\nWow mate! You should really consider do some grocery shopping..."
     print "\n"
@@ -112,5 +106,3 @@ else
         print "\n"
     end
 end
-
-
