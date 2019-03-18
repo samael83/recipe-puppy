@@ -1,7 +1,7 @@
 module BaseURL
 
     # Init base URL
-    def BaseURL.init(base, params)
+    def self.init(base, params)
         url = base.concat(params.join(','))
         return url
     end
