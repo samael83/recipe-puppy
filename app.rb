@@ -4,9 +4,6 @@ require './libs/NormalizeInput.rb'
 require './libs/BaseURL.rb'
 require './libs/HandleResponse.rb'
 
-# Globals
-base_url = 'http://www.recipepuppy.com/api/?q=omelet&i='
-
 # Greet user and recieve input
 print "\n"
 puts '*' * 40, '*' * 40
@@ -29,13 +26,11 @@ user_input = $stdin.gets.chomp
 user_ingredients = NormalizeInput.to_array(user_input)
 
 # Init base URL for HTTP request
-request_url = BaseURL.init(base_url, user_ingredients)
+request_url = BaseURL.init(user_ingredients)
 
 # Send HTTP GET request and parse JSON
 response = HTTParty.get(request_url)
-
 HandleResponse.error(response.code) if response.code != 200
-
 search_results = JSON.parse(response)
 
 # Check ingredients subroutine
@@ -94,7 +89,7 @@ recipes.each do |recipe|
 
 end
 
-# Present the user with recipes
+# Present possible recipes to user
 if matching_recipe.length == 0
     puts "\n\nWow mate! You should really consider do some grocery shopping..."
     print "\n"
