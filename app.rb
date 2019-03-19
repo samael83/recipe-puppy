@@ -64,9 +64,9 @@ recipes.each do |recipe|
         print "Do you have #{ingredient}? (y/n) > "
         answer = $stdin.gets.chomp
 
-        if answer == 'y'
+        if NormalizeInput.to_string(answer) == 'y'
             user_ingredients.push(ingredient)
-        elsif answer == 'n'
+        elsif NormalizeInput.to_string(answer) == 'n'
             missing_ingredients.push(ingredient)
             add_recipe = !add_recipe
             puts "\nSkipping #{recipe['title'].strip}..."
