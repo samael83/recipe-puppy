@@ -5,8 +5,7 @@ require './libs/BaseURL.rb'
 require './libs/HandleResponse.rb'
 
 # Greet user and recieve input
-print "\n"
-puts '*' * 40, '*' * 40
+puts "\n", '*' * 40, '*' * 40
 puts "\tWelcome to RecipePuppy"
 puts '*' * 40, '*' * 40
 
@@ -15,8 +14,7 @@ Here in RecipePuppy we work around the clock
 to best match what your stomach truly desires.
 """
 
-print "\n"
-puts "Today we will be making omelets."
+puts "\nToday we will be making omelets."
 puts "List the initial ingredients or leave blank"
 print "> "
 
@@ -46,58 +44,54 @@ end
 
 recipes.each do |recipe|
 
-    ingredients = recipe['ingredients'].split(', ')
+    add_recipe = true
+    required_ingredients = recipe['ingredients'].split(', ')
+    current_ingredients = required_ingredients - user_ingredients
 
-    print "\n"
-    puts "let's check if you can make #{recipe['title'].strip}"
-    puts "." * 50
+    puts "\nlet's check if you can make #{recipe['title'].strip}", '-' * 50
 
-    ingredients.each_with_index do |ingredient, idx| # TO DO: Refactor if statements
+    if current_ingredients.empty?
+        puts "\nRecipe for #{recipe['title'].strip} added."
+        matching_recipe.push({'Recipe' => recipe['title'].strip, 'Link' => recipe['href'].strip})
+        break
+    elsif !(current_ingredients & missing_ingredients).empty?
+        puts "You do not have some fo the ingredients for #{recipe['title'].strip}. Skipping..."
+        next
+    end
 
-        # Break current iteration if we know ingredient in missing ingredients
-        if missing_ingredients.include? (ingredient)
-            break
-        end
+    current_ingredients.each do |ingredient|
 
-        # Skip to next iteration if user has ingredient, unless its the last iteration
-        unless idx == ingredients.length - 1
-            next if user_ingredients.include? (ingredient)
-        end
-
-        print "Do you have #{ingredient}? (yes / no) > "
+        print "Do you have #{ingredient}? (y/n) > "
         answer = $stdin.gets.chomp
 
-        # If ingredient missing > add to missing ingredients array and stop iteration
-        if answer.downcase == 'no'
+        if answer == 'y'
+            user_ingredients.push(ingredient)
+        elsif answer == 'n'
             missing_ingredients.push(ingredient)
-            puts "\nDon't worry, Let's try another."
+            add_recipe = !add_recipe
+            puts "\nSkipping #{recipe['title'].strip}..."
             break
         end
 
-        # Add ingredient to user invetory
-        if answer.downcase == 'yes'
-            user_ingredients.push(ingredient)
-        end
-        
-        # If last iteration > add current recipe to final recipes list
-        if idx == ingredients.length - 1
-            puts "\nYey! You can make \"#{recipe['title'].strip}\"!"
-            matching_recipe.push({'Recipe' => recipe['title'].strip, 'Link' => recipe['href'].strip})
-        end
+    end
 
+    if add_recipe
+        puts "\nRecipe for #{recipe['title'].strip} added."
+        matching_recipe.push({'Recipe' => recipe['title'].strip, 'Link' => recipe['href'].strip})
     end
 
 end
 
 # Present possible recipes to user
 if matching_recipe.length == 0
-    puts "\n\nWow mate! You should really consider do some grocery shopping..."
-    print "\n"
+    puts "\n\nWow mate! You should really consider do some grocery shopping...", "\n"
 else
     puts "\n\nThere you go Sir, some tasty recipes for you to try out!"
+    puts '.' * 50, "\n"
+    
     matching_recipe.each do |item|
         puts "Recipe: #{item['Recipe']}"
-        puts "Link: #{item['Link']}"
-        print "\n"
+        puts "Link: #{item['Link']}", "\n"
     end
+    
 end
