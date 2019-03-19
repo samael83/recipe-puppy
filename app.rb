@@ -46,29 +46,29 @@ recipes.each do |recipe|
 
     add_recipe = true
     required_ingredients = recipe['ingredients'].split(', ')
-    current_ingredients = required_ingredients - user_ingredients
+    ro_verify_ingredients = required_ingredients - user_ingredients
 
     puts "\nlet's check if you can make #{recipe['title'].strip}", '-' * 50
 
-    if current_ingredients.empty?
+    if ro_verify_ingredients.empty?
         puts "\nRecipe for #{recipe['title'].strip} added."
         matching_recipe.push({'Recipe' => recipe['title'].strip, 'Link' => recipe['href'].strip})
-        break
-    elsif !(current_ingredients & missing_ingredients).empty?
+        next
+    elsif !(ro_verify_ingredients & missing_ingredients).empty?
         puts "You do not have some fo the ingredients for #{recipe['title'].strip}. Skipping..."
         next
     end
 
-    current_ingredients.each do |ingredient|
+    ro_verify_ingredients.each do |ingredient|
 
         print "Do you have #{ingredient}? (y/n) > "
         answer = $stdin.gets.chomp
 
-        if NormalizeInput.to_string(answer) == 'y'
+        if NormalizeInput.first_char(answer) == 'y'
             user_ingredients.push(ingredient)
-        elsif NormalizeInput.to_string(answer) == 'n'
+        elsif NormalizeInput.first_char(answer) == 'n'
             missing_ingredients.push(ingredient)
-            add_recipe = !add_recipe
+            add_recipe = false
             puts "\nSkipping #{recipe['title'].strip}..."
             break
         end

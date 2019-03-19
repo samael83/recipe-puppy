@@ -7,9 +7,9 @@ module NormalizeInput
         return arr
     end
 
-    # to String method
-    def self.to_string(input)
-        return input.strip.downcase
+    # get first char from input
+    def self.first_char(input)
+        return input.strip.downcase[0]
     end
 
 end
